@@ -41,7 +41,7 @@ export default function Header() {
                         {/* RIGHT SECTION - Auth Buttons */}
                         <div className="flex items-center gap-6">
                             <Link
-                                href="/signin"
+                                href="/login"
                                 className="text-[15px] text-gray-700 hover:text-gray-900 font-normal"
                             >
                                 Đăng nhập

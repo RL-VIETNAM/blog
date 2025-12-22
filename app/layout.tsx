@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import ConditionalLayout from "@/components/layout/ConditionalLayout";
 
 export const metadata: Metadata = {
   title: "Blog Reinforcement Learning Vietnam",
@@ -21,9 +20,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="antialiased">
-        <Header />
-        {children}
-        <Footer />
+        <ConditionalLayout>
+          {children}
+        </ConditionalLayout>
       </body>
     </html>
   );
