@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser, getUserProfile } from '@/lib/auth-server';
+import PostForm from '@/components/dashboard/PostForm';
+import { getCategories } from '@/lib/categories';
 
 export default async function NewPostPage() {
     const user = await getCurrentUser();
@@ -14,6 +16,8 @@ export default async function NewPostPage() {
         redirect('/');
     }
 
+    const categories = await getCategories();
+
     return (
         <div className="space-y-6">
             <div>
@@ -22,7 +26,7 @@ export default async function NewPostPage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <p className="text-gray-500">Form tạo bài viết sẽ được thêm vào đây</p>
+                <PostForm categories={categories} />
             </div>
         </div>
     );
