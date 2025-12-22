@@ -9,7 +9,6 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-    { label: 'Dashboard', href: '/dashboard' },
     { label: 'Bài viết', href: '/dashboard/posts' },
 ];
 
