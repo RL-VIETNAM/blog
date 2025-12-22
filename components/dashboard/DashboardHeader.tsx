@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { getCurrentUser, getUserProfile, signOut, type UserProfile } from '@/lib/auth-client';
+import { logout } from '@/app/actions/auth';
 
 export default function DashboardHeader() {
-    const router = useRouter();
     const pathname = usePathname();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
@@ -24,9 +24,7 @@ export default function DashboardHeader() {
     };
 
     const handleSignOut = async () => {
-        await signOut();
-        router.push('/login');
-        router.refresh();
+        await logout();
     };
 
     // Generate breadcrumbs từ pathname
@@ -85,7 +83,14 @@ export default function DashboardHeader() {
                                 Đăng xuất
                             </button>
                         </>
-                    ) : null}
+                    ) : (
+                        <a
+                            href="/login"
+                            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                            Đăng nhập
+                        </a>
+                    )}
                 </div>
             </div>
         </header>

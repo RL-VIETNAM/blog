@@ -8,15 +8,11 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
     const pathname = usePathname();
     const isDashboard = pathname.startsWith('/dashboard');
 
-    if (isDashboard) {
-        return <>{children}</>;
-    }
-
     return (
         <>
             <Header />
             {children}
-            <Footer />
+            {!isDashboard && <Footer />}
         </>
     );
 }
