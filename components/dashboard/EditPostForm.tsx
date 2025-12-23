@@ -5,7 +5,18 @@ import { useRouter } from 'next/navigation';
 import TiptapEditor from '@/components/editor/TiptapEditor';
 import { calculateReadingTime } from '@/lib/post-utils';
 
-interface PostFormData {
+interface EditPostFormProps {
+    postId: string;
+    initialData: {
+        title: string;
+        slug: string;
+        category: string;
+        featuredImage: string;
+        content: string;
+    };
+}
+
+interface FormData {
     title: string;
     slug: string;
     category: string;
@@ -13,23 +24,9 @@ interface PostFormData {
     content: string;
 }
 
-interface PostFormProps {
-    postId?: string;
-    initialData?: PostFormData;
-}
-
-export default function PostForm({ postId, initialData }: PostFormProps) {
+export default function EditPostForm({ postId, initialData }: EditPostFormProps) {
     const router = useRouter();
-    const [formData, setFormData] = useState<PostFormData>(
-        initialData || {
-            title: '',
-            slug: '',
-            category: '',
-            featuredImage: '',
-            content: '',
-        }
-    );
-
+    const [formData, setFormData] = useState<FormData>(initialData);
     const [isMetadataOpen, setIsMetadataOpen] = useState(true);
     const [isContentOpen, setIsContentOpen] = useState(true);
     const [readingTime, setReadingTime] = useState(0);
@@ -66,11 +63,8 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
         setIsSubmitting(true);
 
         try {
-            const url = postId ? `/api/posts/${postId}` : '/api/posts';
-            const method = postId ? 'PUT' : 'POST';
-
-            const response = await fetch(url, {
-                method,
+            const response = await fetch(`/api/posts/${postId}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -83,7 +77,7 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || `${postId ? 'Cập nhật' : 'Tạo'} bài viết thất bại`);
+                throw new Error(data.error || 'Cập nhật bài viết thất bại');
             }
 
             router.push('/dashboard/posts');
@@ -93,6 +87,10 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleCancel = () => {
+        router.push('/dashboard/posts');
     };
 
     return (
@@ -142,6 +140,7 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="Nhập tiêu đề bài viết"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
 
@@ -158,6 +157,7 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="slug-bai-viet"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
 
@@ -174,6 +174,7 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="Nhập danh mục"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
 
@@ -190,6 +191,7 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="https://example.com/image.jpg"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
                         </div>
@@ -237,17 +239,18 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
             <div className="flex gap-4 justify-end pt-4 border-t border-gray-200">
                 <button
                     type="button"
-                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                    onClick={handleCancel}
+                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                     disabled={isSubmitting}
                 >
-                    Lưu nháp
+                    Hủy
                 </button>
                 <button
                     type="submit"
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isSubmitting}
                 >
-                    {isSubmitting ? (postId ? 'Đang cập nhật...' : 'Đang xuất bản...') : (postId ? 'Cập nhật' : 'Xuất bản')}
+                    {isSubmitting ? 'Đang cập nhật...' : 'Cập nhật'}
                 </button>
             </div>
         </form>

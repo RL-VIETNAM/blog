@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser, getUserProfile } from '@/lib/auth-server';
+import { getPostById } from '@/lib/posts';
+import PostForm from '@/components/dashboard/PostForm';
 
-export default async function EditPostPage({ params }: { params: { id: string } }) {
+export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
     const user = await getCurrentUser();
 
     if (!user) {
@@ -14,6 +16,21 @@ export default async function EditPostPage({ params }: { params: { id: string } 
         redirect('/');
     }
 
+    const { id } = await params;
+    const post = await getPostById(id);
+
+    if (!post) {
+        redirect('/dashboard/posts');
+    }
+
+    const initialData = {
+        title: post.title,
+        slug: post.slug,
+        category: post.category.name,
+        featuredImage: post.featuredImage || '',
+        content: post.content,
+    };
+
     return (
         <div className="space-y-6">
             <div>
@@ -22,7 +39,7 @@ export default async function EditPostPage({ params }: { params: { id: string } 
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <p className="text-gray-500">Form sửa bài viết ID: {params.id} sẽ được thêm vào đây</p>
+                <PostForm postId={id} initialData={initialData} />
             </div>
         </div>
     );

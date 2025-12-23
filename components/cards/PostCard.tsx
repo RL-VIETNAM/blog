@@ -1,5 +1,4 @@
 import { Post } from '@/types/blog';
-import Image from 'next/image';
 import Link from 'next/link';
 
 interface PostCardProps {
@@ -14,11 +13,10 @@ export default function PostCard({ post }: PostCardProps) {
                     {/* Icon/Image - Landscape Rectangle - No rounded corners */}
                     <div className="flex-shrink-0">
                         <div className="relative w-[240px] h-[135px] overflow-hidden bg-gray-100">
-                            <Image
+                            <img
                                 src={post.featuredImage}
                                 alt={post.title}
-                                fill
-                                className="object-cover"
+                                className="absolute inset-0 w-full h-full object-cover"
                             />
                         </div>
                     </div>

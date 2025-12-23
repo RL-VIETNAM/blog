@@ -1,5 +1,4 @@
 import { Post } from '@/types/blog';
-import Image from 'next/image';
 import Link from 'next/link';
 import CategoryTag from '../ui/CategoryTag';
 import AuthorInfo from '../ui/AuthorInfo';
@@ -16,11 +15,10 @@ export default function FeaturedCard({ post, layout = 'horizontal' }: FeaturedCa
                 <article className="group bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-2xl">
                     {/* Image */}
                     <div className="relative w-full aspect-video overflow-hidden">
-                        <Image
+                        <img
                             src={post.featuredImage}
                             alt={post.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                     </div>
 
@@ -55,11 +53,10 @@ export default function FeaturedCard({ post, layout = 'horizontal' }: FeaturedCa
                 <div className="grid md:grid-cols-2 gap-0">
                     {/* Image */}
                     <div className="relative aspect-square overflow-hidden">
-                        <Image
+                        <img
                             src={post.featuredImage}
                             alt={post.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                     </div>
 
