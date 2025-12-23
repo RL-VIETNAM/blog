@@ -37,19 +37,19 @@ export default async function PostsPage() {
                     <table className="w-full">
                         <thead className="bg-gray-50 border-b border-gray-200">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-8 py-4 text-left text-xs font-semibold text-gray-600 uppercase" style={{ letterSpacing: '0.1em' }}>
                                     Tiêu đề
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-8 py-4 text-left text-xs font-semibold text-gray-600 uppercase" style={{ letterSpacing: '0.1em' }}>
                                     Danh mục
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-8 py-4 text-left text-xs font-semibold text-gray-600 uppercase" style={{ letterSpacing: '0.1em' }}>
                                     Tác giả
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-8 py-4 text-left text-xs font-semibold text-gray-600 uppercase" style={{ letterSpacing: '0.1em' }}>
                                     Ngày xuất bản
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-8 py-4 text-right text-xs font-semibold text-gray-600 uppercase" style={{ letterSpacing: '0.1em' }}>
                                     Thao tác
                                 </th>
                             </tr>
@@ -57,7 +57,7 @@ export default async function PostsPage() {
                         <tbody className="bg-white divide-y divide-gray-200">
                             {posts.map((post) => (
                                 <tr key={post.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4">
+                                    <td className="px-8 py-5">
                                         <div className="flex items-center">
                                             <div>
                                                 <div className="text-sm font-medium text-gray-900">
@@ -69,7 +69,7 @@ export default async function PostsPage() {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-8 py-5 whitespace-nowrap">
                                         <span
                                             className="px-2 py-1 text-xs font-medium rounded-full"
                                             style={{
@@ -80,15 +80,15 @@ export default async function PostsPage() {
                                             {post.category.name}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-8 py-5 whitespace-nowrap">
                                         <div className="text-sm text-gray-900">{post.author.name}</div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-8 py-5 whitespace-nowrap">
                                         <div className="text-sm text-gray-500">
                                             {new Date(post.publishedAt).toLocaleDateString('vi-VN')}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium">
                                         <Link
                                             href={`/dashboard/posts/${post.id}/edit`}
                                             className="text-blue-600 hover:text-blue-900 mr-4"

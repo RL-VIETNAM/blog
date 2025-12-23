@@ -96,7 +96,7 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
             {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
                     {error}
@@ -107,9 +107,9 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
                 <button
                     type="button"
                     onClick={() => setIsMetadataOpen(!isMetadataOpen)}
-                    className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors"
+                    className="w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors"
                 >
-                    <span className="font-semibold text-gray-900">Metadata</span>
+                    <span className="font-semibold text-gray-900" style={{ letterSpacing: '0.02em' }}>Metadata</span>
                     <svg
                         className={`w-5 h-5 text-gray-600 transition-transform ${isMetadataOpen ? 'rotate-180' : ''
                             }`}
@@ -128,9 +128,9 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
 
                 {isMetadataOpen && (
                     <div className="p-6 bg-white">
-                        <div className="space-y-6">
-                            <div>
-                                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                        <div>
+                            <div className="grid grid-cols-[200px_1fr] gap-6 items-center pb-6">
+                                <label htmlFor="title" className="text-sm font-medium text-gray-700">
                                     Tiêu đề bài viết
                                 </label>
                                 <input
@@ -139,14 +139,15 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
                                     name="title"
                                     value={formData.title}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="Nhập tiêu đề bài viết"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
 
-                            <div>
-                                <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+                            <div className="grid grid-cols-[200px_1fr] gap-6 items-center pb-6">
+                                <label htmlFor="slug" className="text-sm font-medium text-gray-700">
                                     Slug
                                 </label>
                                 <input
@@ -155,14 +156,15 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
                                     name="slug"
                                     value={formData.slug}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="slug-bai-viet"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
 
-                            <div>
-                                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                            <div className="grid grid-cols-[200px_1fr] gap-6 items-center pb-6">
+                                <label htmlFor="category" className="text-sm font-medium text-gray-700">
                                     Danh mục
                                 </label>
                                 <input
@@ -171,14 +173,15 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
                                     name="category"
                                     value={formData.category}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="Nhập danh mục"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
 
-                            <div>
-                                <label htmlFor="featuredImage" className="block text-sm font-medium text-gray-700 mb-2">
+                            <div className="grid grid-cols-[200px_1fr] gap-6 items-center">
+                                <label htmlFor="featuredImage" className="text-sm font-medium text-gray-700">
                                     URL ảnh đại diện
                                 </label>
                                 <input
@@ -187,9 +190,10 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
                                     name="featuredImage"
                                     value={formData.featuredImage}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="https://example.com/image.jpg"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
                         </div>
@@ -201,10 +205,10 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
                 <button
                     type="button"
                     onClick={() => setIsContentOpen(!isContentOpen)}
-                    className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors"
+                    className="w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors"
                 >
                     <div className="flex items-center gap-3">
-                        <span className="font-semibold text-gray-900">Nội dung bài viết</span>
+                        <span className="font-semibold text-gray-900" style={{ letterSpacing: '0.02em' }}>Nội dung bài viết</span>
                         {readingTime > 0 && (
                             <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded">
                                 {readingTime} phút đọc

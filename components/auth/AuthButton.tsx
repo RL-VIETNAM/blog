@@ -8,6 +8,7 @@ export default function AuthButton() {
     const router = useRouter();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const [signingOut, setSigningOut] = useState(false);
 
     useEffect(() => {
         loadUser();
@@ -23,6 +24,7 @@ export default function AuthButton() {
     };
 
     const handleSignOut = async () => {
+        setSigningOut(true);
         await signOut();
         setProfile(null);
         router.push('/');
@@ -60,9 +62,10 @@ export default function AuthButton() {
                 <span className="text-sm text-gray-700">{profile.display_name}</span>
                 <button
                     onClick={handleSignOut}
-                    className="text-sm text-red-600 hover:text-red-700 transition-colors"
+                    disabled={signingOut}
+                    className="text-sm text-red-600 hover:text-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Đăng xuất
+                    {signingOut ? 'Đang đăng xuất...' : 'Đăng xuất'}
                 </button>
             </div>
         </div>

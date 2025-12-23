@@ -32,13 +32,13 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
     };
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900">Sửa bài viết</h1>
-                <p className="text-gray-600 mt-1">Chỉnh sửa nội dung bài viết</p>
+        <div className="space-y-8">
+            <div className="space-y-3">
+                <h1 className="text-3xl font-bold text-gray-900" style={{ letterSpacing: '0.02em' }}>Sửa bài viết</h1>
+                <p className="text-gray-600">Chỉnh sửa nội dung bài viết</p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
                 <PostForm postId={id} initialData={initialData} />
             </div>
         </div>
