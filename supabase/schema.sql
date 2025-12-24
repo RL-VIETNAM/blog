@@ -23,10 +23,15 @@ DROP TABLE IF EXISTS authors CASCADE;
 DROP TABLE IF EXISTS user_profiles CASCADE;
 
 -- Xóa user cũ nếu tồn tại (chỉ xóa user test, không xóa tất cả)
-DELETE FROM auth.users WHERE email = 'vudinhdang2004tb@gmail.com';
+DELETE FROM auth.users WHERE email IN (
+    'vudinhdang2004tb@gmail.com',
+    'phamxuankhang2004@gmail.com',
+    'thucpkn@gmail.com',
+    'duonghiepthongminh@gmail.com'
+);
 
 -- =====================================================
--- CREATE DEFAULT ADMIN USER
+-- CREATE DEFAULT ADMIN USERS
 -- =====================================================
 
 -- Tạo user mặc định trong auth.users
@@ -34,57 +39,67 @@ DO $$
 DECLARE
     new_user_id uuid;
     user_exists boolean;
+    user_email text;
 BEGIN
-    -- Kiểm tra user đã tồn tại chưa
-    SELECT EXISTS(
-        SELECT 1 FROM auth.users WHERE email = 'vudinhdang2004tb@gmail.com'
-    ) INTO user_exists;
-    
-    IF NOT user_exists THEN
-        -- Tạo user trong auth.users
-        INSERT INTO auth.users (
-            instance_id,
-            id,
-            aud,
-            role,
-            email,
-            encrypted_password,
-            email_confirmed_at,
-            recovery_sent_at,
-            last_sign_in_at,
-            raw_app_meta_data,
-            raw_user_meta_data,
-            created_at,
-            updated_at,
-            confirmation_token,
-            email_change,
-            email_change_token_new,
-            recovery_token
-        ) VALUES (
-            '00000000-0000-0000-0000-000000000000',
-            gen_random_uuid(),
-            'authenticated',
-            'authenticated',
-            'vudinhdang2004tb@gmail.com',
-            crypt('giacmorlvn', gen_salt('bf')),
-            NOW(),
-            NOW(),
-            NOW(),
-            '{"provider":"email","providers":["email"]}',
-            '{"display_name":"Admin"}',
-            NOW(),
-            NOW(),
-            '',
-            '',
-            '',
-            ''
-        )
-        RETURNING id INTO new_user_id;
+    -- Danh sách email cần tạo
+    FOREACH user_email IN ARRAY ARRAY[
+        'vudinhdang2004tb@gmail.com',
+        'phamxuankhang2004@gmail.com',
+        'thucpkn@gmail.com',
+        'duonghiepthongminh@gmail.com'
+    ]
+    LOOP
+        -- Kiểm tra user đã tồn tại chưa
+        SELECT EXISTS(
+            SELECT 1 FROM auth.users WHERE email = user_email
+        ) INTO user_exists;
         
-        RAISE NOTICE 'Created admin user with ID: %', new_user_id;
-    ELSE
-        RAISE NOTICE 'Admin user already exists, skipping creation';
-    END IF;
+        IF NOT user_exists THEN
+            -- Tạo user trong auth.users
+            INSERT INTO auth.users (
+                instance_id,
+                id,
+                aud,
+                role,
+                email,
+                encrypted_password,
+                email_confirmed_at,
+                recovery_sent_at,
+                last_sign_in_at,
+                raw_app_meta_data,
+                raw_user_meta_data,
+                created_at,
+                updated_at,
+                confirmation_token,
+                email_change,
+                email_change_token_new,
+                recovery_token
+            ) VALUES (
+                '00000000-0000-0000-0000-000000000000',
+                gen_random_uuid(),
+                'authenticated',
+                'authenticated',
+                user_email,
+                crypt('giacmorlvn', gen_salt('bf')),
+                NOW(),
+                NOW(),
+                NOW(),
+                '{"provider":"email","providers":["email"]}',
+                '{"display_name":"Admin"}',
+                NOW(),
+                NOW(),
+                '',
+                '',
+                '',
+                ''
+            )
+            RETURNING id INTO new_user_id;
+            
+            RAISE NOTICE 'Created admin user with ID: % for email: %', new_user_id, user_email;
+        ELSE
+            RAISE NOTICE 'Admin user % already exists, skipping creation', user_email;
+        END IF;
+    END LOOP;
 END $$;
 
 -- =====================================================
@@ -203,14 +218,19 @@ CREATE TRIGGER on_auth_user_created
     FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
 -- =====================================================
--- CREATE ADMIN PROFILE
+-- CREATE ADMIN PROFILES
 -- =====================================================
 
--- Tạo profile admin cho user vừa tạo
+-- Tạo profile admin cho tất cả users vừa tạo
 INSERT INTO user_profiles (id, role, display_name)
 SELECT id, 'admin', 'Admin'
 FROM auth.users
-WHERE email = 'vudinhdang2004tb@gmail.com'
+WHERE email IN (
+    'vudinhdang2004tb@gmail.com',
+    'phamxuankhang2004@gmail.com',
+    'thucpkn@gmail.com',
+    'duonghiepthongminh@gmail.com'
+)
 ON CONFLICT (id) DO UPDATE
 SET role = 'admin', display_name = 'Admin';
 
@@ -218,7 +238,11 @@ SET role = 'admin', display_name = 'Admin';
 -- HOÀN THÀNH
 -- =====================================================
 -- Database đã được reset và tạo lại thành công
--- Admin user: vudinhdang2004tb@gmail.com
+-- Admin users:
+--   - vudinhdang2004tb@gmail.com
+--   - phamxuankhang2004@gmail.com
+--   - thucpkn@gmail.com
+--   - duonghiepthongminh@gmail.com
 -- Password: giacmorlvn
 -- =====================================================
 
