@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import TiptapEditor from '@/components/editor/TiptapEditor';
+import ImageUploader from '@/components/ui/ImageUploader';
 import { calculateReadingTime } from '@/lib/post-utils';
 
 interface PostFormData {
@@ -180,19 +181,17 @@ export default function PostForm({ postId, initialData }: PostFormProps) {
                                 />
                             </div>
 
-                            <div className="grid grid-cols-[200px_1fr] gap-6 items-center">
-                                <label htmlFor="featuredImage" className="text-sm font-medium text-gray-700">
-                                    URL ảnh đại diện
+                            <div className="grid grid-cols-[200px_1fr] gap-6 items-start">
+                                <label className="text-sm font-medium text-gray-700 pt-2">
+                                    Ảnh đại diện
                                 </label>
-                                <input
-                                    type="url"
-                                    id="featuredImage"
-                                    name="featuredImage"
+                                <ImageUploader
                                     value={formData.featuredImage}
-                                    onChange={handleInputChange}
-                                    className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                                    placeholder="https://example.com/image.jpg"
-                                    required
+                                    onChange={(url) => setFormData(prev => ({ ...prev, featuredImage: url }))}
+                                    folder="blog/featured"
+                                    aspectRatio="16:9"
+                                    maxWidth={1200}
+                                    maxHeight={675}
                                     disabled={isSubmitting}
                                 />
                             </div>
