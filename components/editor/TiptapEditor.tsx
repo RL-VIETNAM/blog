@@ -2,7 +2,9 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
 import { useEffect } from 'react';
+import ImageUploadButton from './ImageUploadButton';
 
 interface TiptapEditorProps {
     content: string;
@@ -15,6 +17,13 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
             StarterKit.configure({
                 heading: {
                     levels: [1, 2, 3, 4],
+                },
+            }),
+            Image.configure({
+                inline: false,
+                allowBase64: false,
+                HTMLAttributes: {
+                    class: 'max-w-full h-auto rounded-lg',
                 },
             }),
         ],
@@ -141,6 +150,8 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
                 </button>
 
                 <div className="w-px bg-gray-300 mx-1"></div>
+
+                <ImageUploadButton editor={editor} />
 
                 <button
                     type="button"
