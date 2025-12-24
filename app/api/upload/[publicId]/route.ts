@@ -3,10 +3,10 @@ import { deleteImage } from '@/lib/cloudinary';
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { publicId: string } }
+    { params }: { params: Promise<{ publicId: string }> }
 ) {
     try {
-        const { publicId } = params;
+        const { publicId } = await params;
 
         if (!publicId) {
             return NextResponse.json(
