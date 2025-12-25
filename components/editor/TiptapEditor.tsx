@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 interface TiptapEditorProps {
     content: string;
@@ -16,7 +19,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         if (typeof window === 'undefined') return;
 
         if (content.trim().startsWith('<') && content.includes('>')) {
-            const TurndownService = require('turndown');
+            const TurndownService = require('turndown').default || require('turndown');
             const turndownService = new TurndownService({
                 headingStyle: 'atx',
                 codeBlockStyle: 'fenced',
@@ -163,6 +166,26 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
                     Code
                 </button>
 
+
+                <button
+                    type="button"
+                    onClick={() => insertAtCursor('$', '$')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Inline math"
+                >
+                    $x$
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => insertAtCursor('\n$$\n', '\n$$\n')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Block math"
+                >
+                    $$x$$
+                </button>
+
+
                 <button
                     type="button"
                     onClick={() => insertAtCursor('\n---\n')}
@@ -194,7 +217,8 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
                     </div>
                     <div className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none min-h-[500px] p-4 overflow-auto">
                         <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
+                            remarkPlugins={[remarkGfm, remarkMath]}
+                            rehypePlugins={[rehypeKatex]}
                             components={{
                                 img: ({ node, ...props }) => (
                                     <img {...props} className="max-w-full h-auto rounded-lg" />

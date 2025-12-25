@@ -169,3 +169,53 @@ export async function PUT(
         );
     }
 }
+
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params;
+        const user = await getCurrentUser();
+
+        if (!user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        const profile = await getUserProfile(user.id);
+
+        if (!profile || profile.role !== 'admin') {
+            return NextResponse.json(
+                { error: 'Forbidden - Admin only' },
+                { status: 403 }
+            );
+        }
+
+        const supabase = await createServerClient();
+
+        const { error } = await supabase
+            .from('posts')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            console.error('Error deleting post:', error);
+            return NextResponse.json(
+                { error: 'Failed to delete post', details: error },
+                { status: 500 }
+            );
+        }
+
+        return NextResponse.json({ success: true });
+
+    } catch (error) {
+        console.error('Error in DELETE /api/posts/[id]:', error);
+        return NextResponse.json(
+            { error: 'Internal server error' },
+            { status: 500 }
+        );
+    }
+}

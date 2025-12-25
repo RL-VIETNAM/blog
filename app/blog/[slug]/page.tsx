@@ -1,5 +1,10 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import { getPostBySlug } from '@/lib/posts';
 import { formatDate } from '@/lib/utils';
 
@@ -70,10 +75,19 @@ export default async function BlogPostPage({ params }: PageProps) {
             <div className="blog-post-content">
                 <div className="container">
                     <div className="content-wrapper">
-                        <div
-                            className="prose"
-                            dangerouslySetInnerHTML={{ __html: post.content }}
-                        />
+                        <div className="prose">
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm, remarkMath]}
+                                rehypePlugins={[rehypeKatex]}
+                                components={{
+                                    img: ({ node, ...props }) => (
+                                        <img {...props} className="max-w-full h-auto rounded-lg" />
+                                    )
+                                }}
+                            >
+                                {post.content}
+                            </ReactMarkdown>
+                        </div>
                     </div>
                 </div>
             </div>
