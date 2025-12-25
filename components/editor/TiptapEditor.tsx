@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import TurndownService from 'turndown';
 
 interface TiptapEditorProps {
     content: string;
@@ -14,7 +13,10 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     const [sourceCode, setSourceCode] = useState('');
 
     useEffect(() => {
+        if (typeof window === 'undefined') return;
+
         if (content.trim().startsWith('<') && content.includes('>')) {
+            const TurndownService = require('turndown');
             const turndownService = new TurndownService({
                 headingStyle: 'atx',
                 codeBlockStyle: 'fenced',
