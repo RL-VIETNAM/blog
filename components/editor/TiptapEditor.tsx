@@ -1,10 +1,9 @@
 'use client';
 
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
-import { useEffect } from 'react';
-import ImageUploadButton from './ImageUploadButton';
+import { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import TurndownService from 'turndown';
 
 interface TiptapEditorProps {
     content: string;
@@ -12,73 +11,69 @@ interface TiptapEditorProps {
 }
 
 export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
-    const editor = useEditor({
-        extensions: [
-            StarterKit.configure({
-                heading: {
-                    levels: [1, 2, 3, 4],
-                },
-            }),
-            Image.configure({
-                inline: false,
-                allowBase64: false,
-                HTMLAttributes: {
-                    class: 'max-w-full h-auto rounded-lg',
-                },
-            }),
-        ],
-        content: content,
-        immediatelyRender: false,
-        editorProps: {
-            attributes: {
-                class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none min-h-[400px] p-4',
-            },
-        },
-        onUpdate: ({ editor }) => {
-            onChange(editor.getHTML());
-        },
-    });
+    const [sourceCode, setSourceCode] = useState('');
 
     useEffect(() => {
-        if (editor && content !== editor.getHTML()) {
-            editor.commands.setContent(content);
+        if (content.trim().startsWith('<') && content.includes('>')) {
+            const turndownService = new TurndownService({
+                headingStyle: 'atx',
+                codeBlockStyle: 'fenced',
+            });
+            const markdown = turndownService.turndown(content);
+            setSourceCode(markdown);
+        } else {
+            setSourceCode(content);
         }
-    }, [content, editor]);
+    }, [content]);
 
-    if (!editor) {
-        return null;
-    }
+    const handleSourceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const newContent = e.target.value;
+        setSourceCode(newContent);
+        onChange(newContent);
+    };
+
+    const insertAtCursor = (before: string, after: string = '') => {
+        const textarea = document.getElementById('source-editor') as HTMLTextAreaElement;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = sourceCode.substring(start, end);
+        const newText = sourceCode.substring(0, start) + before + selectedText + after + sourceCode.substring(end);
+
+        setSourceCode(newText);
+        onChange(newText);
+
+        setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+        }, 0);
+    };
 
     return (
         <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
             <div className="border-b border-gray-300 bg-gray-50 p-2 flex flex-wrap gap-1">
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().toggleBold().run()}
-                    className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${editor.isActive('bold')
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
+                    onClick={() => insertAtCursor('**', '**')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Bold"
                 >
                     B
                 </button>
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().toggleItalic().run()}
-                    className={`px-3 py-1.5 rounded text-sm font-medium italic transition-colors ${editor.isActive('italic')
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
+                    onClick={() => insertAtCursor('*', '*')}
+                    className="px-3 py-1.5 rounded text-sm font-medium italic bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Italic"
                 >
                     I
                 </button>
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().toggleStrike().run()}
-                    className={`px-3 py-1.5 rounded text-sm font-medium line-through transition-colors ${editor.isActive('strike')
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
+                    onClick={() => insertAtCursor('~~', '~~')}
+                    className="px-3 py-1.5 rounded text-sm font-medium line-through bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Strikethrough"
                 >
                     S
                 </button>
@@ -87,31 +82,25 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
 
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                    className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${editor.isActive('heading', { level: 1 })
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
+                    onClick={() => insertAtCursor('# ', '')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Heading 1"
                 >
                     H1
                 </button>
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                    className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${editor.isActive('heading', { level: 2 })
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
+                    onClick={() => insertAtCursor('## ', '')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Heading 2"
                 >
                     H2
                 </button>
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-                    className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${editor.isActive('heading', { level: 3 })
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
+                    onClick={() => insertAtCursor('### ', '')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Heading 3"
                 >
                     H3
                 </button>
@@ -120,65 +109,101 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
 
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().toggleBulletList().run()}
-                    className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${editor.isActive('bulletList')
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
+                    onClick={() => insertAtCursor('- ', '')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Unordered List"
                 >
                     UL
                 </button>
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                    className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${editor.isActive('orderedList')
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
+                    onClick={() => insertAtCursor('1. ', '')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Ordered List"
                 >
                     OL
                 </button>
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                    className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${editor.isActive('blockquote')
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
+                    onClick={() => insertAtCursor('> ', '')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Blockquote"
                 >
                     Quote
                 </button>
 
                 <div className="w-px bg-gray-300 mx-1"></div>
 
-                <ImageUploadButton editor={editor} />
+                <button
+                    type="button"
+                    onClick={() => insertAtCursor('![alt text](', ')')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Chèn ảnh"
+                >
+                    Image
+                </button>
 
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().setHorizontalRule().run()}
+                    onClick={() => insertAtCursor('[link text](', ')')}
                     className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Chèn link"
+                >
+                    Link
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => insertAtCursor('`', '`')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors font-mono"
+                    title="Inline code"
+                >
+                    Code
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => insertAtCursor('\n---\n')}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    title="Horizontal Rule"
                 >
                     HR
                 </button>
-                <button
-                    type="button"
-                    onClick={() => editor.chain().focus().undo().run()}
-                    disabled={!editor.can().undo()}
-                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                    Undo
-                </button>
-                <button
-                    type="button"
-                    onClick={() => editor.chain().focus().redo().run()}
-                    disabled={!editor.can().redo()}
-                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                    Redo
-                </button>
             </div>
 
-            <EditorContent editor={editor} />
+            <div className="grid grid-cols-2 gap-0 divide-x divide-gray-300">
+                <div className="bg-gray-50">
+                    <div className="px-4 py-2 bg-gray-100 border-b border-gray-300 text-sm font-medium text-gray-700">
+                        Markdown
+                    </div>
+                    <textarea
+                        id="source-editor"
+                        value={sourceCode}
+                        onChange={handleSourceChange}
+                        className="w-full min-h-[500px] p-4 font-mono text-sm resize-none focus:outline-none bg-white"
+                        spellCheck={false}
+                        placeholder="Viết markdown ở đây..."
+                    />
+                </div>
+
+                <div className="bg-white">
+                    <div className="px-4 py-2 bg-gray-100 border-b border-gray-300 text-sm font-medium text-gray-700">
+                        Preview
+                    </div>
+                    <div className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none min-h-[500px] p-4 overflow-auto">
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                                img: ({ node, ...props }) => (
+                                    <img {...props} className="max-w-full h-auto rounded-lg" />
+                                )
+                            }}
+                        >
+                            {sourceCode}
+                        </ReactMarkdown>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
