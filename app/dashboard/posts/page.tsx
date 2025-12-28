@@ -83,10 +83,10 @@ export default async function PostsPage() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-3 whitespace-nowrap">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center justify-end gap-2">
                                             <Link
                                                 href={`/dashboard/posts/${post.id}/edit`}
-                                                className="px-3 py-1.5 text-sm text-blue-600 hover:text-blue-900 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                                                className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                                             >
                                                 Sửa
                                             </Link>

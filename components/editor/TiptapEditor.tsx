@@ -16,6 +16,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     const [sourceCode, setSourceCode] = useState('');
     const [isUploadingImage, setIsUploadingImage] = useState(false);
     const imageInputRef = useRef<HTMLInputElement>(null);
+    const [activeTab, setActiveTab] = useState<'markdown' | 'preview'>('markdown');
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -282,11 +283,31 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
                 className="hidden"
             />
 
-            <div className="grid grid-cols-2 gap-0 divide-x divide-gray-300">
-                <div className="bg-gray-50">
-                    <div className="px-4 py-2 bg-gray-100 border-b border-gray-300 text-sm font-medium text-gray-700">
-                        Markdown
-                    </div>
+            <div className="border-b border-gray-300 bg-gray-100 flex">
+                <button
+                    type="button"
+                    onClick={() => setActiveTab('markdown')}
+                    className={`px-6 py-3 text-sm font-medium transition-colors ${activeTab === 'markdown'
+                            ? 'bg-white text-gray-900 border-b-2 border-blue-600'
+                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                        }`}
+                >
+                    Markdown
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setActiveTab('preview')}
+                    className={`px-6 py-3 text-sm font-medium transition-colors ${activeTab === 'preview'
+                            ? 'bg-white text-gray-900 border-b-2 border-blue-600'
+                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                        }`}
+                >
+                    Preview
+                </button>
+            </div>
+
+            <div className="bg-white">
+                {activeTab === 'markdown' ? (
                     <textarea
                         id="source-editor"
                         value={sourceCode}
@@ -295,12 +316,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
                         spellCheck={false}
                         placeholder="Viết markdown ở đây..."
                     />
-                </div>
-
-                <div className="bg-white">
-                    <div className="px-4 py-2 bg-gray-100 border-b border-gray-300 text-sm font-medium text-gray-700">
-                        Preview
-                    </div>
+                ) : (
                     <div className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none min-h-[500px] p-4 overflow-auto">
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm, remarkMath]}
@@ -314,7 +330,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
                             {sourceCode}
                         </ReactMarkdown>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

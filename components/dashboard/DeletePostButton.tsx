@@ -46,7 +46,7 @@ export default function DeletePostButton({ postId, postTitle }: DeletePostButton
         <>
             <button
                 onClick={() => setShowConfirm(true)}
-                className="px-3 py-1.5 text-sm text-red-600 hover:text-red-900 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
             >
                 Xóa
             </button>
