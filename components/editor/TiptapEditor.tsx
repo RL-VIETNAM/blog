@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -14,6 +14,8 @@ interface TiptapEditorProps {
 
 export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     const [sourceCode, setSourceCode] = useState('');
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const imageInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -53,6 +55,81 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
             textarea.focus();
             textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
         }, 0);
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('File phải là ảnh');
+            return;
+        }
+
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('File quá lớn. Tối đa 10MB');
+            return;
+        }
+
+        const textarea = document.getElementById('source-editor') as HTMLTextAreaElement;
+        if (!textarea) return;
+
+        const loadingPlaceholder = '![loading image...](/loading.gif)';
+        const cursorStart = textarea.selectionStart;
+        const cursorEnd = textarea.selectionEnd;
+
+        const textWithLoading = sourceCode.substring(0, cursorStart) + loadingPlaceholder + sourceCode.substring(cursorEnd);
+        setSourceCode(textWithLoading);
+        onChange(textWithLoading);
+
+        try {
+            setIsUploadingImage(true);
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('folder', 'blog/content');
+
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Upload thất bại');
+            }
+
+            const data = await response.json();
+
+            const imageMarkdown = `![${file.name.replace(/\.[^/.]+$/, '')}](${data.url})`;
+            const newText = textWithLoading.replace(loadingPlaceholder, imageMarkdown);
+
+            setSourceCode(newText);
+            onChange(newText);
+
+            setTimeout(() => {
+                textarea.focus();
+                const newPosition = cursorStart + imageMarkdown.length;
+                textarea.setSelectionRange(newPosition, newPosition);
+            }, 0);
+
+            if (imageInputRef.current) {
+                imageInputRef.current.value = '';
+            }
+        } catch (err) {
+            const textWithoutLoading = textWithLoading.replace(loadingPlaceholder, '');
+            setSourceCode(textWithoutLoading);
+            onChange(textWithoutLoading);
+
+            alert(err instanceof Error ? err.message : 'Có lỗi xảy ra khi upload ảnh');
+        } finally {
+            setIsUploadingImage(false);
+        }
+    };
+
+    const handleImageButtonClick = () => {
+        imageInputRef.current?.click();
     };
 
     return (
@@ -141,11 +218,12 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
 
                 <button
                     type="button"
-                    onClick={() => insertAtCursor('![alt text](', ')')}
-                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                    onClick={handleImageButtonClick}
+                    disabled={isUploadingImage}
+                    className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Chèn ảnh"
                 >
-                    Image
+                    {isUploadingImage ? 'Uploading...' : 'Image'}
                 </button>
 
                 <button
@@ -195,6 +273,14 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
                     HR
                 </button>
             </div>
+
+            <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+            />
 
             <div className="grid grid-cols-2 gap-0 divide-x divide-gray-300">
                 <div className="bg-gray-50">
